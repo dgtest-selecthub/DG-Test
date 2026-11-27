@@ -1,0 +1,31 @@
+name: Create Artifact Attestation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build sample artifact
+        run: |
+          mkdir -p dist
+          echo "build output" > dist/sample-artifact.txt
+
+      - name: Generate attestation
+        id: create_attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: "./dist/sample-artifact.txt"
+
+      - name: Print attestation ID
+        run: |
+          echo "Attestation ID: ${{ steps.create_attestation.outputs.attestation-id }}"
+          echo "Attestation URL: ${{ steps.create_attestation.outputs.attestation-url }}"
